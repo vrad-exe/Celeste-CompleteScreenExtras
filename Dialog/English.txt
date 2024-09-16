@@ -19,12 +19,22 @@
 # {anchor} controls the visual position of the textbox in-game
 
 # Test stuff
-ModOptions_CompleteScreenExtras_Title=    Complete Screen Extras
+ModOptions_CompleteScreenExtras_Title= Complete Screen Extras
 
-ModOptions_CompleteScreenExtras_AnimMode=          Text Animation Timing
-ModOptions_CompleteScreenExtras_AnimMode_Help=
-    Disabled - vanilla behavior{n}
-    Original - pre-release behavior{n}
-    Delayed - custom behavior
+ModOptions_CompleteScreenExtras_TextAnimLayerFix= Fix Text Layering
+ModOptions_CompleteScreenExtras_TextAnimLayerFix_Help=
+    Makes the text draw over the fade-in so the animation is visible.{n}
+	If disabled, it will still be visible with high delays.
 
-ModOptions_CompleteScreenExtras_RainbowMode= Rainbow Text
+ModOptions_CompleteScreenExtras_TextAnimDelay= Animation Delay
+ModOptions_CompleteScreenExtras_TextAnimDelay_Help=
+	Measured in tenths of seconds{n}
+	(Everest doesn't seem to support fractional settings){n}
+	0 = Normal behavior{n}
+	10 = Sync with fade-in{n}
+	25 = Sync with back rectangle
+
+ModOptions_CompleteScreenExtras_TextRainbowMode=                     Rainbow Text
+ModOptions_CompleteScreenExtrasModule_TextRainbowMode_Always=        Always
+ModOptions_CompleteScreenExtrasModule_TextRainbowMode_FullClearOnly= Only on Full Clear
+ModOptions_CompleteScreenExtrasModule_TextRainbowMode_Disabled=      Disabled

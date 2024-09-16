@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using IL.Monocle;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -33,12 +34,6 @@ public class CompleteScreenExtrasModule : EverestModule {
 		Logger.Log(LoggerName, "Computer, activate IL hooks");
 		IL.Celeste.AreaComplete.ctor += Hook_AreaComplete_Ctor;
 		IL.Celeste.CompleteRenderer.RenderContent += Hook_CompleteRenderer_RenderContent;
-
-		// need to hook the orig_ version this way
-		hook_AreaComplete_Update = new ILHook(
-				typeof(AreaComplete).GetMethod("orig_Update", BindingFlags.Public | BindingFlags.Instance),
-				Hook_AreaComplete_Update
-			);
 	}
 
 	public override void Unload() {
@@ -48,7 +43,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 		hook_AreaComplete_Update.Dispose();
 	}
 
-	// copied from extended variants
+	// modified from extended variants (it's MIT license)
 	private MethodReference SeekReferenceToMethod(ILContext il, string methodName, OpCode opcode)
 	{
 		ILCursor cursor = new ILCursor(il);
@@ -77,6 +72,15 @@ public class CompleteScreenExtrasModule : EverestModule {
 			|| (Settings.TextRainbowMode == CompleteScreenExtrasModuleSettings.TextRainbowModeType.FullClearOnly && isFullClear);
 	}
 
+	private static void SetTextDelays(AreaCompleteTitle title)
+	{
+		foreach (AreaCompleteTitle.Letter letter in title.letters)
+		{
+			// Delay is in 1/10 seconds because everest doesn't support float settings
+			letter.delay += (Settings.TextAnimDelay / 10.0f);
+		}
+	}
+
 	private void Hook_AreaComplete_Ctor(ILContext il)
 	{
 		ILCursor cursor = new ILCursor(il);
@@ -93,6 +97,12 @@ public class CompleteScreenExtrasModule : EverestModule {
 			cursor.Emit(OpCodes.Ldarg_1);
 			cursor.Emit(OpCodes.Callvirt, session_get_FullClear);
 			cursor.EmitDelegate<Func<bool, bool>>(ShouldUseChapterRainbow);
+
+			// Delay all letters by user specified amount
+			cursor.Index += 2;
+			cursor.Emit(OpCodes.Ldarg_0);
+			cursor.Emit(OpCodes.Ldfld, typeof(AreaComplete).GetField("title", BindingFlags.NonPublic | BindingFlags.Instance));
+			cursor.EmitDelegate(SetTextDelays);
 		}
 	}
 
@@ -169,15 +179,4 @@ public class CompleteScreenExtrasModule : EverestModule {
 			cursor.Next.Operand = fadeBranchTarget;
 		}
 	}
-
-
-	// ----- ANIMATED TEXT DELAY -----
-
-	private static float textDelay = 0f;
-
-	private void Hook_AreaComplete_Update(ILContext il)
-	{
-
-	}
-
 }
