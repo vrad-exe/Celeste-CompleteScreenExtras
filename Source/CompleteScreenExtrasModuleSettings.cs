@@ -1,13 +1,13 @@
-namespace Celeste.Mod.ChapterCompleteAdditions;
+namespace Celeste.Mod.CompleteScreenExtras;
 
-[SettingName("modoptions_chaptercompleteadditions_title")]
-public class ChapterCompleteAdditionsModuleSettings : EverestModuleSettings {
+[SettingName("modoptions_completescreenextras_title")]
+public class CompleteScreenExtrasModuleSettings : EverestModuleSettings {
 
-    [SettingName("modoptions_chaptercompleteadditions_animmode")]
-    [SettingSubText("modoptions_chaptercompleteadditions_animmode_help")]
+    [SettingName("modoptions_completescreenextras_animmode")]
+    [SettingSubText("modoptions_completescreenextras_animmode_help")]
     public TextAnimModeType TextAnimMode { get; set; } = TextAnimModeType.Original;
 
-    [SettingName("modoptions_chaptercompleteadditions_rainbowmode")]
+    [SettingName("modoptions_completescreenextras_rainbowmode")]
     public TextRainbowModeType TextRainbowMode { get; set; } = TextRainbowModeType.Disabled;
 
     public enum TextAnimModeType

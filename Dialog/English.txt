@@ -19,12 +19,12 @@
 # {anchor} controls the visual position of the textbox in-game
 
 # Test stuff
-ModOptions_ChapterCompleteAdditions_Title=    Chapter Complete Additions
+ModOptions_CompleteScreenExtras_Title=    Complete Screen Extras
 
-ModOptions_ChapterCompleteAdditions_AnimMode=          Text Animation Timing
-ModOptions_ChapterCompleteAdditions_AnimMode_Help=
+ModOptions_CompleteScreenExtras_AnimMode=          Text Animation Timing
+ModOptions_CompleteScreenExtras_AnimMode_Help=
     Disabled - vanilla behavior{n}
     Original - pre-release behavior{n}
     Delayed - custom behavior
 
-ModOptions_ChapterCompleteAdditions_RainbowMode= Rainbow Text
+ModOptions_CompleteScreenExtras_RainbowMode= Rainbow Text

@@ -6,25 +6,25 @@ using MonoMod.Utils;
 using System;
 using System.Reflection;
 
-namespace Celeste.Mod.ChapterCompleteAdditions;
+namespace Celeste.Mod.CompleteScreenExtras;
 
-public class ChapterCompleteAdditionsModule : EverestModule {
-    public static ChapterCompleteAdditionsModule Instance { get; private set; }
+public class CompleteScreenExtrasModule : EverestModule {
+    public static CompleteScreenExtrasModule Instance { get; private set; }
 
-    public override Type SettingsType => typeof(ChapterCompleteAdditionsModuleSettings);
-    public static ChapterCompleteAdditionsModuleSettings Settings => (ChapterCompleteAdditionsModuleSettings) Instance._Settings;
+    public override Type SettingsType => typeof(CompleteScreenExtrasModuleSettings);
+    public static CompleteScreenExtrasModuleSettings Settings => (CompleteScreenExtrasModuleSettings) Instance._Settings;
 
-    public override Type SessionType => typeof(ChapterCompleteAdditionsModuleSession);
-    public static ChapterCompleteAdditionsModuleSession Session => (ChapterCompleteAdditionsModuleSession) Instance._Session;
+    public override Type SessionType => typeof(CompleteScreenExtrasModuleSession);
+    public static CompleteScreenExtrasModuleSession Session => (CompleteScreenExtrasModuleSession) Instance._Session;
 
-    public override Type SaveDataType => typeof(ChapterCompleteAdditionsModuleSaveData);
-    public static ChapterCompleteAdditionsModuleSaveData SaveData => (ChapterCompleteAdditionsModuleSaveData) Instance._SaveData;
+    public override Type SaveDataType => typeof(CompleteScreenExtrasModuleSaveData);
+    public static CompleteScreenExtrasModuleSaveData SaveData => (CompleteScreenExtrasModuleSaveData) Instance._SaveData;
 
     private static ILHook hook_AreaComplete_RenderUI;
 
-    public const string LoggerName = "ChapterCompleteAdditions";
+    public const string LoggerName = "CompleteScreenExtras";
 
-    public ChapterCompleteAdditionsModule() {
+    public CompleteScreenExtrasModule() {
         Instance = this;
 #if DEBUG
         // debug builds use verbose logging
@@ -77,8 +77,8 @@ public class ChapterCompleteAdditionsModule : EverestModule {
 
     private static bool ShouldUseChapterRainbow(bool isFullClear)
     {
-        return Settings.TextRainbowMode == ChapterCompleteAdditionsModuleSettings.TextRainbowModeType.Always
-            || (Settings.TextRainbowMode == ChapterCompleteAdditionsModuleSettings.TextRainbowModeType.FullClearOnly && isFullClear);
+        return Settings.TextRainbowMode == CompleteScreenExtrasModuleSettings.TextRainbowModeType.Always
+            || (Settings.TextRainbowMode == CompleteScreenExtrasModuleSettings.TextRainbowModeType.FullClearOnly && isFullClear);
     }
 
     private void modChapterRainbow(ILContext il)
@@ -109,11 +109,11 @@ public class ChapterCompleteAdditionsModule : EverestModule {
     // easier to hook in these functions instead of having it grab the settings directly
     private static bool ShouldAnimateOriginal()
     {
-        return Settings.TextAnimMode == ChapterCompleteAdditionsModuleSettings.TextAnimModeType.Original;
+        return Settings.TextAnimMode == CompleteScreenExtrasModuleSettings.TextAnimModeType.Original;
     }
     private static bool ShouldAnimateDelayed()
     {
-        return Settings.TextAnimMode == ChapterCompleteAdditionsModuleSettings.TextAnimModeType.Delayed;
+        return Settings.TextAnimMode == CompleteScreenExtrasModuleSettings.TextAnimModeType.Delayed;
     }
 
     private void modChapterAnim(ILContext il)
