@@ -14,14 +14,6 @@ public class CompleteScreenExtrasModule : EverestModule {
     public override Type SettingsType => typeof(CompleteScreenExtrasModuleSettings);
     public static CompleteScreenExtrasModuleSettings Settings => (CompleteScreenExtrasModuleSettings) Instance._Settings;
 
-    public override Type SessionType => typeof(CompleteScreenExtrasModuleSession);
-    public static CompleteScreenExtrasModuleSession Session => (CompleteScreenExtrasModuleSession) Instance._Session;
-
-    public override Type SaveDataType => typeof(CompleteScreenExtrasModuleSaveData);
-    public static CompleteScreenExtrasModuleSaveData SaveData => (CompleteScreenExtrasModuleSaveData) Instance._SaveData;
-
-    private static ILHook hook_AreaComplete_RenderUI;
-
     public const string LoggerName = "CompleteScreenExtras";
 
     public CompleteScreenExtrasModule() {
@@ -36,20 +28,15 @@ public class CompleteScreenExtrasModule : EverestModule {
     }
 
     public override void Load() {
-        // temporary
         Logger.Log(LoggerName, "Computer, activate IL hooks");
-        IL.Celeste.AreaComplete.ctor += modChapterRainbow;
-        IL.Celeste.CompleteRenderer.RenderContent += modChapterAnim;
-
-        // don't need this
-        //hook_AreaComplete_RenderUI = new ILHook(
-        //        typeof(AreaComplete).GetMethod("orig_RenderUI", BindingFlags.NonPublic | BindingFlags.Instance),
-        //        modChapterAnim
-        //    );
+        IL.Celeste.AreaComplete.ctor += Hook_AreaComplete_Ctor;
+        IL.Celeste.CompleteRenderer.RenderContent += Hook_CompleteRenderer_RenderContent;
     }
 
     public override void Unload() {
-        // TODO: unapply any hooks applied in Load()
+        Logger.Log(LoggerName, "Computer, deactivate IL hooks");
+        IL.Celeste.AreaComplete.ctor -= Hook_AreaComplete_Ctor;
+        IL.Celeste.CompleteRenderer.RenderContent -= Hook_CompleteRenderer_RenderContent;
     }
 
     // copied from extended variants
@@ -81,7 +68,7 @@ public class CompleteScreenExtrasModule : EverestModule {
             || (Settings.TextRainbowMode == CompleteScreenExtrasModuleSettings.TextRainbowModeType.FullClearOnly && isFullClear);
     }
 
-    private void modChapterRainbow(ILContext il)
+    private void Hook_AreaComplete_Ctor(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
 
@@ -116,7 +103,7 @@ public class CompleteScreenExtrasModule : EverestModule {
         return Settings.TextAnimMode == CompleteScreenExtrasModuleSettings.TextAnimModeType.Delayed;
     }
 
-    private void modChapterAnim(ILContext il)
+    private void Hook_CompleteRenderer_RenderContent(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
 
