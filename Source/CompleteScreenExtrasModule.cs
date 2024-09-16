@@ -75,7 +75,7 @@ public class CompleteScreenExtrasModule : EverestModule {
         MethodReference session_get_FullClear = SeekReferenceToMethod(il, "get_FullClear", OpCodes.Callvirt);
 
         // jump to where AreaCompleteTitle is instantiated
-        while (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj(typeof(AreaCompleteTitle)) ))
+        if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj(typeof(AreaCompleteTitle)) ))
         {
             Logger.Log(LoggerName, $"Patching rainbow text at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
 
@@ -84,9 +84,6 @@ public class CompleteScreenExtrasModule : EverestModule {
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.Emit(OpCodes.Callvirt, session_get_FullClear);
             cursor.EmitDelegate<Func<bool, bool>>(ShouldUseChapterRainbow);
-
-            // advance past it so we don't infinite loop
-            cursor.GotoNext();
         }
     }
 
@@ -162,12 +159,9 @@ public class CompleteScreenExtrasModule : EverestModule {
 
         // Finally, go back and update the fadeAlpha > 0 branch to jump to our code instead of straight to EndRender
         // Otherwise all the text disappears once the fadein finishes
-        if (cursor.TryGotoPrev(MoveType.Before, instr => instr.OpCode == OpCodes.Ble_Un_S))
+        if (cursor.TryGotoPrev(MoveType.Before, instr => instr.OpCode == OpCodes.Ble_Un_S) && fadeBranchTarget != null)
         {
-            if (fadeBranchTarget != null)
-            {
-                cursor.Next.Operand = fadeBranchTarget;
-            }
+            cursor.Next.Operand = fadeBranchTarget;
         }
     }
 }
