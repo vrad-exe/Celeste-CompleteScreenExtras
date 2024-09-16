@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ChapterCompleteAdditions": {
+      "commandName": "Project"
+    },
+    "Run Celeste": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Games\\Epic Games\\Celeste\\Celeste.exe",
+      "workingDirectory": "D:\\Games\\SteamLibrary\\steamapps\\common\\Celeste"
+    }
+  }
+}
