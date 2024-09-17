@@ -17,8 +17,6 @@ public class CompleteScreenExtrasModule : EverestModule {
 
 	public const string LoggerName = "CompleteScreenExtras";
 
-	private static ILHook hook_AreaComplete_Update;
-
 	public CompleteScreenExtrasModule() {
 		Instance = this;
 #if DEBUG
@@ -40,7 +38,6 @@ public class CompleteScreenExtrasModule : EverestModule {
 		Logger.Log(LoggerName, "Computer, deactivate IL hooks");
 		IL.Celeste.AreaComplete.ctor -= Hook_AreaComplete_Ctor;
 		IL.Celeste.CompleteRenderer.RenderContent -= Hook_CompleteRenderer_RenderContent;
-		hook_AreaComplete_Update.Dispose();
 	}
 
 	// modified from extended variants (it's MIT license)
