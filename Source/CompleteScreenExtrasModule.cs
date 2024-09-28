@@ -40,27 +40,6 @@ public class CompleteScreenExtrasModule : EverestModule {
 		IL.Celeste.CompleteRenderer.RenderContent -= Hook_CompleteRenderer_RenderContent;
 	}
 
-	// modified from extended variants (it's MIT license)
-	private MethodReference SeekReferenceToMethod(ILContext il, string methodName, OpCode opcode)
-	{
-		ILCursor cursor = new ILCursor(il);
-		if (cursor.TryGotoNext(MoveType.Before, instr => instr.OpCode == opcode && ((MethodReference)instr.Operand).Name.Contains(methodName)))
-		{
-			return (MethodReference)cursor.Next.Operand;
-		}
-		return null;
-	}
-
-	private FieldReference SeekReferenceToField(ILContext il, string fieldName, OpCode opcode)
-	{
-		ILCursor cursor = new ILCursor(il);
-		if (cursor.TryGotoNext(MoveType.Before, instr => instr.OpCode == opcode && ((FieldReference)instr.Operand).Name.Contains(fieldName)))
-		{
-			return (FieldReference)cursor.Next.Operand;
-		}
-		return null;
-	}
-
 	// ----- RAINBOW TEXT -----
 
 	private static bool ShouldUseChapterRainbow(bool isFullClear)
@@ -82,7 +61,15 @@ public class CompleteScreenExtrasModule : EverestModule {
 	{
 		ILCursor cursor = new ILCursor(il);
 
-		MethodReference session_get_FullClear = SeekReferenceToMethod(il, "get_FullClear", OpCodes.Callvirt);
+		MethodInfo session_get_FullClear = typeof(Session).GetMethod("get_FullClear", BindingFlags.Public | BindingFlags.Instance);
+		FieldInfo AreaComplete_title = typeof(AreaComplete).GetField("title", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		if (session_get_FullClear == null || AreaComplete_title == null)
+		{
+			Logger.Log(LogLevel.Warn, LoggerName,
+				"Couldn't find required fields/methods for AreaComplete::Ctor hook! Did the game update, or is another mod conflicting?");
+			return;
+		}
 
 		// jump to where AreaCompleteTitle is instantiated
 		if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj(typeof(AreaCompleteTitle)) ))
@@ -98,7 +85,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 			// Delay all letters by user specified amount
 			cursor.Index += 2;
 			cursor.Emit(OpCodes.Ldarg_0);
-			cursor.Emit(OpCodes.Ldfld, typeof(AreaComplete).GetField("title", BindingFlags.NonPublic | BindingFlags.Instance));
+			cursor.Emit(OpCodes.Ldfld, AreaComplete_title);
 			cursor.EmitDelegate(SetTextDelays);
 		}
 	}
@@ -116,9 +103,16 @@ public class CompleteScreenExtrasModule : EverestModule {
 	{
 		ILCursor cursor = new ILCursor(il);
 
-		FieldReference CompleteRenderer_RenderPostUI = SeekReferenceToField(il, "RenderPostUI", OpCodes.Ldfld);
-		MethodReference HiresRenderer_EndRender = SeekReferenceToMethod(il, "EndRender", OpCodes.Call);
-		MethodReference System_Action_Invoke = SeekReferenceToMethod(il, "Invoke", OpCodes.Callvirt);
+		FieldInfo CompleteRenderer_RenderPostUI = typeof(CompleteRenderer).GetField("RenderPostUI", BindingFlags.Public | BindingFlags.Instance);
+		MethodInfo HiresRenderer_EndRender = typeof(HiresRenderer).GetMethod("EndRender", BindingFlags.Public | BindingFlags.Static);
+		MethodInfo System_Action_Invoke = typeof(System.Action).GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
+
+		if (CompleteRenderer_RenderPostUI == null || HiresRenderer_EndRender == null || System_Action_Invoke == null) 
+		{
+			Logger.Log(LogLevel.Warn, LoggerName,
+				"Couldn't find required fields/methods for CompleteRenderer::RenderContent hook! Did the game update, or is another mod conflicting?");
+			return;
+		}
 
 		// We need to swap the order in which it draws the UI elements
 		// First, add a check to skip drawing the text at the original point
