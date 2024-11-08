@@ -25,7 +25,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 		Logger.SetLogLevel(LOGGER_NAME, LogLevel.Verbose);
 #else
 		// release builds use info logging to reduce spam in log files
-		Logger.SetLogLevel(LoggerName, LogLevel.Info);
+		Logger.SetLogLevel(LOGGER_NAME, LogLevel.Info);
 #endif
 	}
 
