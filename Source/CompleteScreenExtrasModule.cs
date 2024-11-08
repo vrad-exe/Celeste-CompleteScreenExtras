@@ -15,13 +15,14 @@ public class CompleteScreenExtrasModule : EverestModule {
 	public override Type SettingsType => typeof(CompleteScreenExtrasModuleSettings);
 	public static CompleteScreenExtrasModuleSettings Settings => (CompleteScreenExtrasModuleSettings) Instance._Settings;
 
-	public const string LoggerName = "CompleteScreenExtras";
+	// Name that we display in the logger
+	public const string LOGGER_NAME = "CompleteScreenExtras";
 
 	public CompleteScreenExtrasModule() {
 		Instance = this;
 #if DEBUG
 		// debug builds use verbose logging
-		Logger.SetLogLevel(LoggerName, LogLevel.Verbose);
+		Logger.SetLogLevel(LOGGER_NAME, LogLevel.Verbose);
 #else
 		// release builds use info logging to reduce spam in log files
 		Logger.SetLogLevel(LoggerName, LogLevel.Info);
@@ -29,13 +30,13 @@ public class CompleteScreenExtrasModule : EverestModule {
 	}
 
 	public override void Load() {
-		Logger.Log(LoggerName, "Computer, activate IL hooks");
+		Logger.Log(LOGGER_NAME, "Computer, activate IL hooks");
 		IL.Celeste.AreaComplete.ctor += Hook_AreaComplete_Ctor;
 		IL.Celeste.CompleteRenderer.RenderContent += Hook_CompleteRenderer_RenderContent;
 	}
 
 	public override void Unload() {
-		Logger.Log(LoggerName, "Computer, deactivate IL hooks");
+		Logger.Log(LOGGER_NAME, "Computer, deactivate IL hooks");
 		IL.Celeste.AreaComplete.ctor -= Hook_AreaComplete_Ctor;
 		IL.Celeste.CompleteRenderer.RenderContent -= Hook_CompleteRenderer_RenderContent;
 	}
@@ -66,7 +67,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 
 		if (session_get_FullClear == null || AreaComplete_title == null)
 		{
-			Logger.Log(LogLevel.Warn, LoggerName,
+			Logger.Log(LogLevel.Warn, LOGGER_NAME,
 				"Couldn't find required fields/methods for AreaComplete::Ctor hook! Did the game update, or is another mod conflicting?");
 			return;
 		}
@@ -74,7 +75,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 		// jump to where AreaCompleteTitle is instantiated
 		if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj(typeof(AreaCompleteTitle)) ))
 		{
-			Logger.Log(LoggerName, $"Patching rainbow text at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
+			Logger.Log(LOGGER_NAME, $"Patching rainbow text at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
 
 			// pop the original 0 off the stack, then get the value from the function
 			cursor.Emit(OpCodes.Pop);
@@ -109,7 +110,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 
 		if (CompleteRenderer_RenderPostUI == null || HiresRenderer_EndRender == null || System_Action_Invoke == null) 
 		{
-			Logger.Log(LogLevel.Warn, LoggerName,
+			Logger.Log(LogLevel.Warn, LOGGER_NAME,
 				"Couldn't find required fields/methods for CompleteRenderer::RenderContent hook! Did the game update, or is another mod conflicting?");
 			return;
 		}
@@ -120,7 +121,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 		{
 			// go after the following brfalse.s
 			cursor.GotoNext(MoveType.After, instr => instr.OpCode == OpCodes.Brfalse_S);
-			Logger.Log(LoggerName, $"Patching chapter text drawing, part 1: at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
+			Logger.Log(LOGGER_NAME, $"Patching chapter text drawing, part 1: at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
 
 			// Add check for if the setting is in "original" mode
 			cursor.EmitDelegate<Func<bool>>(ShouldFixTextLayering);
@@ -136,7 +137,7 @@ public class CompleteScreenExtrasModule : EverestModule {
 		// Now we need to move the text draw to the end of the function, after the fade stuff has been done
 		if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCall(HiresRenderer_EndRender)))
 		{
-			Logger.Log(LoggerName, $"Patching chapter text drawing, part 2: at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
+			Logger.Log(LOGGER_NAME, $"Patching chapter text drawing, part 2: at {cursor.Index} in CIL code for {cursor.Method.FullName}!");
 
 			// This is where we want the fade to branch to
 			fadeBranchTarget = cursor.DefineLabel();
